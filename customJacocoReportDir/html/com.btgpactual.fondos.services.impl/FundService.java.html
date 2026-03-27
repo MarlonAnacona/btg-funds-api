@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FundService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">fondos-api</a> &gt; <a href="index.source.html" class="el_package">com.btgpactual.fondos.services.impl</a> &gt; <span class="el_source">FundService.java</span></div><h1>FundService.java</h1><pre class="source lang-java linenums">package com.btgpactual.fondos.services.impl;
+
+import com.btgpactual.fondos.models.document.Fund;
+import com.btgpactual.fondos.models.dto.RegisterFunds;
+import com.btgpactual.fondos.models.dto.Response;
+import com.btgpactual.fondos.repositories.FundRepository;
+import com.btgpactual.fondos.services.IFundService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Service
+<span class="fc" id="L15">public class FundService implements IFundService {</span>
+
+    @Autowired
+    FundRepository fundRepository;
+
+
+    /**
+     * Creates a new fund in the database.
+     *
+     * This method validates the input request before persisting the fund.
+     * Required fields are: name and minimum amount.
+     *
+     * @param request Object containing the data needed to create a new fund.
+     * @return Response Message indicating the operation was successful.
+     * @throws IllegalArgumentException if the request is null, the name is empty,
+     *                                  or the minimum amount is less than or equal to zero.
+     */
+    @Override
+    public Response create(RegisterFunds request) {
+
+<span class="fc" id="L35">        valideRequest(request);</span>
+
+<span class="fc" id="L37">        Fund fund = new Fund();</span>
+<span class="fc" id="L38">        fund.setName(request.getName());</span>
+<span class="fc" id="L39">        fund.setCategory(request.getCategory());</span>
+<span class="fc" id="L40">        fund.setMinimumAmount(request.getMinimumAmount());</span>
+
+<span class="fc" id="L42">        fundRepository.save(fund);</span>
+
+<span class="fc" id="L44">        return new Response(&quot;Fondo creado exitosamente&quot;);</span>
+    }
+
+    /**
+     * Validates the input request for creating a fund.
+     *
+     * Extracting validation into a separate method keeps the main method clean
+     * and focused on a single responsibility.
+     *
+     * @param request Fund registration request to validate.
+     * @throws IllegalArgumentException if the request is null or contains invalid data.
+     */
+    private static void valideRequest(RegisterFunds request) {
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (request == null) {</span>
+<span class="fc" id="L58">            throw new IllegalArgumentException(&quot;La solicitud no puede ser nula&quot;);</span>
+        }
+
+<span class="pc bpc" id="L61" title="1 of 4 branches missed.">        if (request.getName() == null || request.getName().trim().isEmpty()) {</span>
+<span class="fc" id="L62">            throw new IllegalArgumentException(&quot;El nombre es obligatorio&quot;);</span>
+        }
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (request.getMinimumAmount() == null ||</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">                request.getMinimumAmount().compareTo(BigDecimal.ZERO) &lt;= 0) {</span>
+<span class="fc" id="L67">            throw new IllegalArgumentException(&quot;El monto mÃ­nimo debe ser mayor a 0&quot;);</span>
+        }
+<span class="fc" id="L69">    }</span>
+
+
+    /**
+     * Retrieves all registered funds from the database.
+     *
+     * Returns an empty list if no funds are found.
+     * Handles exceptions to encapsulate data access errors.
+     *
+     * @return List&lt;Fund&gt; List of funds found, or an empty list if none exist.
+     * @throws RuntimeException if an unexpected error occurs while accessing the database.
+     */
+    @Override
+    public List&lt;Fund&gt; getAll() {
+
+        try {
+<span class="fc" id="L85">            List&lt;Fund&gt; funds = fundRepository.findAll();</span>
+
+<span class="pc bpc" id="L87" title="1 of 4 branches missed.">            if (funds == null || funds.isEmpty()) {</span>
+<span class="fc" id="L88">                return List.of();</span>
+            }
+
+<span class="fc" id="L91">            return funds;</span>
+
+<span class="fc" id="L93">        } catch (Exception e) {</span>
+<span class="fc" id="L94">            throw new RuntimeException(&quot;Error al obtener los fondos&quot;, e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

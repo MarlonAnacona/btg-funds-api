@@ -1,0 +1,33 @@
+
+{
+
+    "name":"FPV_BTG_PACTUAL_RECAUDADORA",
+    "minimumAmount":"75000",
+    "category":"FPV"
+}
+{
+
+    "name":"FPV_BTG_PACTUAL_ECOPETROL",
+    "minimumAmount":"125000",
+    "category":"FPV"
+}
+
+{
+
+    "name":"DEUDAPRIVADA",
+    "minimumAmount":"50000",
+    "category":"FIC"
+}
+
+{
+
+    "name":"FDO-ACCIONES",
+    "minimumAmount":"250000",
+    "category":"FIC"
+}
+{
+
+    "name":"FPV_BTG_PACTUAL_DINAMICA",
+    "minimumAmount":"100000",
+    "category":"FPV"
+}

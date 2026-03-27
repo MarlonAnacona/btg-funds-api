@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InvestmentImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">fondos-api</a> &gt; <a href="index.source.html" class="el_package">com.btgpactual.fondos.services.impl</a> &gt; <span class="el_source">InvestmentImpl.java</span></div><h1>InvestmentImpl.java</h1><pre class="source lang-java linenums">package com.btgpactual.fondos.services.impl;
+
+import com.btgpactual.fondos.models.document.Fund;
+import com.btgpactual.fondos.models.document.Transaction;
+import com.btgpactual.fondos.models.document.User;
+import com.btgpactual.fondos.models.dto.CancellationRequest;
+import com.btgpactual.fondos.models.dto.NotificationRequest;
+import com.btgpactual.fondos.models.dto.Response;
+import com.btgpactual.fondos.models.dto.SubscriptionRequest;
+import com.btgpactual.fondos.models.embedded.Investment;
+import com.btgpactual.fondos.models.enums.NotificationPreference;
+import com.btgpactual.fondos.models.enums.TransactionType;
+import com.btgpactual.fondos.repositories.FundRepository;
+import com.btgpactual.fondos.repositories.TransactionRespository;
+import com.btgpactual.fondos.repositories.UserRepository;
+import com.btgpactual.fondos.services.IInvestment;
+import com.btgpactual.fondos.services.notification.NotificationFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+<span class="fc" id="L26">public class InvestmentImpl implements IInvestment {</span>
+
+
+    public static final String USER_NOT_FOUND = &quot;User not found&quot;;
+    public static final String SUSCRIPCIÃ“N_EXITOSA = &quot;SuscripciÃ³n exitosa&quot;;
+    public static final String SUSCRIPCIÃ“N = &quot;SuscripciÃ³n&quot;;
+    public static final String FUND_NOT_FOUND = &quot;Fund not found&quot;;
+    public static final String NO_AMOUNT_NECESARY = &quot;No tiene saldo disponible para vincularse al fondo &quot;;
+    public static final String NOT_MINIMUM_AMOUNT = &quot;El monto minimo para este fondo es de: &quot;;
+    public static final String NO_SING_FUND = &quot;No estÃ¡ suscrito a este fondo&quot;;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    FundRepository fundRepository;
+
+    @Autowired
+    TransactionRespository transactionRespository;
+
+    @Autowired
+    NotificationFactory notificationFactory;
+
+    /**
+     * Cancels a user's investment in a fund.
+     *
+     * Updates the user's balance, removes the investment, saves a transaction, and persists the changes.
+     *
+     * @param email   User's email to identify the account.
+     * @param request CancellationRequest containing the fund ID to cancel.
+     * @return Response Message indicating the cancellation was successful.
+     * @throws RuntimeException if the user, fund, or investment is not found.
+     */
+    @Override
+    public Response cancellation( String email, CancellationRequest request) {
+
+<span class="fc" id="L60">        User user = userRepository.findByEmail(email)</span>
+<span class="fc" id="L61">                .orElseThrow(() -&gt; new RuntimeException(USER_NOT_FOUND));</span>
+
+
+<span class="fc" id="L64">        Fund fund = fundRepository.findById(request.getFundId())</span>
+<span class="pc" id="L65">                .orElseThrow(() -&gt; new RuntimeException(FUND_NOT_FOUND));</span>
+
+<span class="fc" id="L67">      Investment investment = user.getInvestments().stream()</span>
+<span class="fc" id="L68">                .filter(inv -&gt; inv.getFundId().equals(fund.getId()))</span>
+<span class="fc" id="L69">                .findFirst()</span>
+<span class="pc" id="L70">                .orElseThrow(() -&gt; new RuntimeException(NO_SING_FUND));</span>
+
+<span class="fc" id="L72">        user.setBalance(</span>
+<span class="fc" id="L73">                user.getBalance().add(investment.getAmount())</span>
+        );
+
+<span class="fc" id="L76">        user.getInvestments().remove(investment);</span>
+
+<span class="fc" id="L78">        Transaction transaction = createTransaction(user, fund, investment, TransactionType.CANCELLATION);</span>
+<span class="fc" id="L79">        transactionRespository.save(transaction);</span>
+
+<span class="fc" id="L81">        transactionRespository.save(transaction);</span>
+
+<span class="fc" id="L83">        userRepository.save(user);</span>
+
+
+<span class="fc" id="L86">        return new Response(&quot;CancelaciÃ³n exitosa&quot;);</span>
+
+
+    }
+
+
+    /**
+     * Subscribes a user to a fund.
+     *
+     * Validates that the user has sufficient balance and that the subscription amount meets the fund minimum.
+     * Updates user's balance, creates or updates an investment, logs a transaction, and sends a notification.
+     *
+     * @param email   User's email to identify the account.
+     * @param request SubscriptionRequest containing the fund ID and amount to invest.
+     * @return Response Message indicating subscription success.
+     * @throws Exception if the user or fund is not found, or if the user has insufficient balance or amount below minimum.
+     */
+    @Override
+    public Response subscribe( String email, SubscriptionRequest request) throws  Exception{
+<span class="fc" id="L105">        User user = userRepository.findByEmail(email)</span>
+<span class="pc" id="L106">                .orElseThrow(() -&gt; new RuntimeException(USER_NOT_FOUND));</span>
+
+
+<span class="fc" id="L109">        Fund fund = fundRepository.findById(request.getFundId())</span>
+<span class="pc" id="L110">                .orElseThrow(() -&gt; new Exception(FUND_NOT_FOUND));</span>
+
+
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">            if ((user.getBalance().compareTo(fund.getMinimumAmount()) &lt; 0) || (user.getBalance().compareTo(request.getAmount())&lt;0)) {</span>
+<span class="fc" id="L114">                throw new Exception(</span>
+<span class="fc" id="L115">                        NO_AMOUNT_NECESARY + fund.getName()</span>
+                );
+            }
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            if(request.getAmount().compareTo(fund.getMinimumAmount())&lt;0){</span>
+<span class="nc" id="L119">                throw new Exception(</span>
+<span class="nc" id="L120">                        NOT_MINIMUM_AMOUNT + fund.getMinimumAmount()</span>
+                );
+            }
+
+
+<span class="fc" id="L125">        user.setBalance(</span>
+<span class="fc" id="L126">                user.getBalance().subtract(request.getAmount())</span>
+        );
+
+<span class="fc" id="L129">        Optional&lt;Investment&gt; existingInvestment = user.getInvestments()</span>
+<span class="fc" id="L130">                .stream()</span>
+<span class="pc" id="L131">                .filter(inv -&gt; inv.getFundId().equals(fund.getId()))</span>
+<span class="fc" id="L132">                .findFirst();</span>
+
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">        if (existingInvestment.isPresent()) {</span>
+<span class="nc" id="L135">            existingInvestment.get().setAmount(</span>
+<span class="nc" id="L136">                    existingInvestment.get().getAmount().add(request.getAmount())</span>
+            );
+        } else {
+<span class="fc" id="L139">            Investment newInvestment = new Investment();</span>
+<span class="fc" id="L140">            newInvestment.setFundId(fund.getId());</span>
+<span class="fc" id="L141">            newInvestment.setAmount(request.getAmount());</span>
+<span class="fc" id="L142">            newInvestment.setFundName(fund.getName());</span>
+<span class="fc" id="L143">            newInvestment.setActive(true);</span>
+<span class="fc" id="L144">            newInvestment.setOpeningDate(LocalDateTime.now());</span>
+<span class="fc" id="L145">            user.getInvestments().add(newInvestment);</span>
+        }
+
+<span class="fc" id="L148">        Transaction transaction = createTransaction(user, fund, request.getAmount(), TransactionType.OPENING);</span>
+<span class="fc" id="L149">        transactionRespository.save(transaction);</span>
+
+<span class="fc" id="L151">        userRepository.save(user);</span>
+<span class="fc" id="L152">        NotificationRequest notificationRequest = new NotificationRequest();</span>
+<span class="fc" id="L153">        notificationRequest.setMessage(fund.getName());</span>
+<span class="pc bpc" id="L154" title="1 of 2 branches missed.">        if(user.getNotificationPreference().equals(NotificationPreference.EMAIL)){</span>
+<span class="fc" id="L155">            notificationRequest.setTo(user.getEmail());</span>
+        }else{
+<span class="nc" id="L157">            notificationRequest.setTo(user.getCelphone());</span>
+
+        }
+<span class="fc" id="L160">        notificationRequest.setTo(user.getEmail());</span>
+<span class="fc" id="L161">        notificationRequest.setSubject(SUSCRIPCIÃ“N);</span>
+<span class="fc" id="L162">        notificationRequest.setType(user.getNotificationPreference());</span>
+<span class="fc" id="L163">        notificationFactory.getService(notificationRequest);</span>
+
+<span class="fc" id="L165">                return new Response(SUSCRIPCIÃ“N_EXITOSA);</span>
+
+    }
+
+
+
+
+    /**
+     * Retrieves all transactions for a given user.
+     *
+     * @param email User's email to identify the account.
+     * @return List&lt;Transaction&gt; List of transactions for the user.
+     * @throws RuntimeException if the user is not found.
+     */
+    @Override
+    public List&lt;Transaction&gt; getAll(String email) {
+<span class="fc" id="L181">        User user = userRepository.findByEmail(email)</span>
+<span class="pc" id="L182">                .orElseThrow(() -&gt; new RuntimeException(USER_NOT_FOUND));</span>
+
+<span class="fc" id="L184">        List&lt;Transaction&gt; transactions= transactionRespository.findByCustomerId(user.getId());</span>
+
+<span class="fc" id="L186">        return transactions;</span>
+    }
+
+    /**
+     * Creates a transaction record based on a user's investment.
+     *
+     * @param user       User performing the transaction.
+     * @param fund       Fund related to the transaction.
+     * @param investment Investment object containing the amount.
+     * @param type       Type of transaction (OPENING or CANCELLATION).
+     * @return Transaction Transaction record ready to be saved.
+     */
+    private static Transaction createTransaction(User user, Fund fund, Investment investment, TransactionType type) {
+<span class="fc" id="L199">        return Transaction.builder()</span>
+<span class="fc" id="L200">                .amount(investment.getAmount())</span>
+<span class="fc" id="L201">                .type(type)</span>
+<span class="fc" id="L202">                .fundName(fund.getName())</span>
+<span class="fc" id="L203">                .customerId(user.getId())</span>
+<span class="fc" id="L204">                .fundId(fund.getId())</span>
+<span class="fc" id="L205">                .date(LocalDateTime.now())</span>
+<span class="fc" id="L206">                .build();</span>
+    }
+
+    /**
+     * Creates a transaction record based on a given amount (for subscriptions).
+     *
+     * @param user   User performing the transaction.
+     * @param fund   Fund related to the transaction.
+     * @param amount Amount involved in the transaction.
+     * @param type   Type of transaction (OPENING or CANCELLATION).
+     * @return Transaction Transaction record ready to be saved.
+     */
+    private static Transaction createTransaction(User user, Fund fund, java.math.BigDecimal amount, TransactionType type) {
+<span class="fc" id="L219">        return Transaction.builder()</span>
+<span class="fc" id="L220">                .amount(amount)</span>
+<span class="fc" id="L221">                .type(type)</span>
+<span class="fc" id="L222">                .fundName(fund.getName())</span>
+<span class="fc" id="L223">                .customerId(user.getId())</span>
+<span class="fc" id="L224">                .fundId(fund.getId())</span>
+<span class="fc" id="L225">                .date(LocalDateTime.now())</span>
+<span class="fc" id="L226">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

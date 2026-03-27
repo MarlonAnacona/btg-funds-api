@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/investment")
@@ -20,12 +19,6 @@ public class InvestmentController {
 
     private final IInvestment investmentService;
 
-    @PreAuthorize("hasRole('CLIENT')")
-    @GetMapping
-    public ResponseEntity<?> getFunds(Authentication authentication) {
-        String email = authentication.getName();
-        return ResponseEntity.ok(investmentService.getAll(email));
-    }
 
     @PreAuthorize("hasRole('CLIENT')")
     @PostMapping("/subscribe")

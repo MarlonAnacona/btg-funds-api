@@ -28,4 +28,8 @@ public class RegisterRequest {
 
         private NotificationPreference notificationPreference;
 
+        private String celphone;
+
+        private Role role;
+
 }

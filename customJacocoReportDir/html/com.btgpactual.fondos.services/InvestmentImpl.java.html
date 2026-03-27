@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InvestmentImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">fondos-api</a> &gt; <a href="index.source.html" class="el_package">com.btgpactual.fondos.services</a> &gt; <span class="el_source">InvestmentImpl.java</span></div><h1>InvestmentImpl.java</h1><pre class="source lang-java linenums">package com.btgpactual.fondos.services;
+
+import com.btgpactual.fondos.models.document.Fund;
+import com.btgpactual.fondos.models.document.Transaction;
+import com.btgpactual.fondos.models.document.User;
+import com.btgpactual.fondos.models.dto.CancellationRequest;
+import com.btgpactual.fondos.models.dto.NotificationRequest;
+import com.btgpactual.fondos.models.dto.Response;
+import com.btgpactual.fondos.models.dto.SubscriptionRequest;
+import com.btgpactual.fondos.models.embedded.Investment;
+import com.btgpactual.fondos.models.enums.NotificationPreference;
+import com.btgpactual.fondos.models.enums.TransactionType;
+import com.btgpactual.fondos.repositories.FundRepository;
+import com.btgpactual.fondos.repositories.TransactionRespository;
+import com.btgpactual.fondos.repositories.UserRepository;
+import com.btgpactual.fondos.services.notification.NotificationFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+<span class="nc" id="L25">public class InvestmentImpl implements  IInvestment{</span>
+
+
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    FundRepository fundRepository;
+
+    @Autowired
+    TransactionRespository transactionRespository;
+
+    @Autowired
+    NotificationFactory notificationFactory;
+   
+    @Override
+    public Response cancellation( String email, CancellationRequest request) {
+
+<span class="nc" id="L42">        User user = userRepository.findByEmail(email)</span>
+<span class="nc" id="L43">                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</span>
+
+
+<span class="nc" id="L46">        Fund fund = fundRepository.findById(request.getFundId())</span>
+<span class="nc" id="L47">                .orElseThrow(() -&gt; new RuntimeException(&quot;Fund not found&quot;));</span>
+
+<span class="nc" id="L49">      Investment investment = user.getInvestments().stream()</span>
+<span class="nc" id="L50">                .filter(inv -&gt; inv.getFundId().equals(fund.getId()))</span>
+<span class="nc" id="L51">                .findFirst()</span>
+<span class="nc" id="L52">                .orElseThrow(() -&gt; new RuntimeException(&quot;No estÃ¡ suscrito a este fondo&quot;));</span>
+
+<span class="nc" id="L54">        user.setBalance(</span>
+<span class="nc" id="L55">                user.getBalance().add(investment.getAmount())</span>
+        );
+
+<span class="nc" id="L58">        user.getInvestments().remove(investment);</span>
+
+<span class="nc" id="L60">        Transaction transaction = getTransaction(user, fund, investment);</span>
+
+<span class="nc" id="L62">        transactionRespository.save(transaction);</span>
+
+<span class="nc" id="L64">        userRepository.save(user);</span>
+
+
+<span class="nc" id="L67">        return new Response(&quot;CancelaciÃ³n exitosa&quot;);</span>
+
+
+    }
+
+    private static Transaction getTransaction(User user, Fund fund, Investment investment) {
+<span class="nc" id="L73">        Transaction transaction = Transaction.builder()</span>
+<span class="nc" id="L74">                .amount(investment.getAmount())</span>
+<span class="nc" id="L75">                .type(TransactionType.CANCELLATION)</span>
+<span class="nc" id="L76">                .fundName(fund.getName())</span>
+<span class="nc" id="L77">                .customerId(user.getId())</span>
+<span class="nc" id="L78">                .date(LocalDateTime.now())</span>
+<span class="nc" id="L79">                .fundId(fund.getId())</span>
+<span class="nc" id="L80">                .build();</span>
+<span class="nc" id="L81">        return transaction;</span>
+    }
+
+    @Override
+    public Response subscribe( String email, SubscriptionRequest request) throws  Exception{
+<span class="nc" id="L86">        User user = userRepository.findByEmail(email)</span>
+<span class="nc" id="L87">                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</span>
+
+
+<span class="nc" id="L90">        Fund fund = fundRepository.findById(request.getFundId())</span>
+<span class="nc" id="L91">                .orElseThrow(() -&gt; new Exception(&quot;Fund not found&quot;));</span>
+
+
+<span class="nc bnc" id="L94" title="All 4 branches missed.">            if ((user.getBalance().compareTo(fund.getMinimumAmount()) &lt; 0) || (user.getBalance().compareTo(request.getAmount())&lt;0)) {</span>
+<span class="nc" id="L95">                throw new Exception(</span>
+<span class="nc" id="L96">                        &quot;No tiene saldo disponible para vincularse al fondo &quot; + fund.getName()</span>
+                );
+            }
+<span class="nc bnc" id="L99" title="All 2 branches missed.">            if(request.getAmount().compareTo(fund.getMinimumAmount())&lt;0){</span>
+<span class="nc" id="L100">                throw new Exception(</span>
+<span class="nc" id="L101">                        &quot;El monto minimo para este fondo es de: &quot; + fund.getMinimumAmount()</span>
+                );
+            }
+
+
+<span class="nc" id="L106">        user.setBalance(</span>
+<span class="nc" id="L107">                user.getBalance().subtract(request.getAmount())</span>
+        );
+
+<span class="nc" id="L110">        Optional&lt;Investment&gt; existingInvestment = user.getInvestments()</span>
+<span class="nc" id="L111">                .stream()</span>
+<span class="nc" id="L112">                .filter(inv -&gt; inv.getFundId().equals(fund.getId()))</span>
+<span class="nc" id="L113">                .findFirst();</span>
+
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (existingInvestment.isPresent()) {</span>
+<span class="nc" id="L116">            existingInvestment.get().setAmount(</span>
+<span class="nc" id="L117">                    existingInvestment.get().getAmount().add(request.getAmount())</span>
+            );
+        } else {
+<span class="nc" id="L120">            Investment newInvestment = new Investment();</span>
+<span class="nc" id="L121">            newInvestment.setFundId(fund.getId());</span>
+<span class="nc" id="L122">            newInvestment.setAmount(request.getAmount());</span>
+<span class="nc" id="L123">            newInvestment.setFundName(fund.getName());</span>
+<span class="nc" id="L124">            newInvestment.setActive(true);</span>
+<span class="nc" id="L125">            newInvestment.setOpeningDate(LocalDateTime.now());</span>
+<span class="nc" id="L126">            user.getInvestments().add(newInvestment);</span>
+        }
+
+<span class="nc" id="L129">        Transaction transaction = Transaction.builder()</span>
+<span class="nc" id="L130">                .amount(request.getAmount())</span>
+<span class="nc" id="L131">                .type(TransactionType.OPENING)</span>
+<span class="nc" id="L132">                .fundName(fund.getName())</span>
+<span class="nc" id="L133">                .customerId(user.getId())</span>
+<span class="nc" id="L134">                .date(LocalDateTime.now())</span>
+<span class="nc" id="L135">                .fundId(fund.getId())</span>
+<span class="nc" id="L136">                .build();</span>
+
+<span class="nc" id="L138">        transactionRespository.save(transaction);</span>
+<span class="nc" id="L139">        userRepository.save(user);</span>
+<span class="nc" id="L140">        NotificationRequest notificationRequest = new NotificationRequest();</span>
+<span class="nc" id="L141">        notificationRequest.setMessage(fund.getName());</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        if(user.getNotificationPreference().equals(NotificationPreference.EMAIL)){</span>
+<span class="nc" id="L143">            notificationRequest.setTo(user.getEmail());</span>
+        }else{
+<span class="nc" id="L145">            notificationRequest.setTo(user.getCelphone());</span>
+
+        }
+<span class="nc" id="L148">        notificationRequest.setTo(user.getEmail());</span>
+<span class="nc" id="L149">        notificationRequest.setSubject(&quot;SuscripciÃ³n&quot;);</span>
+<span class="nc" id="L150">        notificationRequest.setType(user.getNotificationPreference());</span>
+<span class="nc" id="L151">        notificationFactory.getService(notificationRequest);</span>
+
+<span class="nc" id="L153">                return new Response(&quot;SuscripciÃ³n exitosa&quot;);</span>
+
+    }
+
+
+
+
+    @Override
+    public List&lt;Transaction&gt; getAll(String email) {
+<span class="nc" id="L162">        User user = userRepository.findByEmail(email)</span>
+<span class="nc" id="L163">                .orElseThrow(() -&gt; new RuntimeException(&quot;User not found&quot;));</span>
+
+<span class="nc" id="L165">        List&lt;Transaction&gt; transactions= transactionRespository.findByCustomerId(user.getId());</span>
+
+<span class="nc" id="L167">        return transactions;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

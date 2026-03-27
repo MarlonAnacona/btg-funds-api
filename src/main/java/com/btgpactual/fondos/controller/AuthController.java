@@ -5,12 +5,10 @@ import com.btgpactual.fondos.security.JwtProvider;
 import com.btgpactual.fondos.models.document.User;
 import com.btgpactual.fondos.models.dto.AuthRequest;
 import com.btgpactual.fondos.models.dto.AuthResponse;
-import com.btgpactual.fondos.models.enums.Role;
 import com.btgpactual.fondos.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,13 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder, JwtProvider jwtProvider) {
+    public AuthController(AuthenticationManager authenticationManager, UserRepository userRepository, JwtProvider jwtProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
     }
 

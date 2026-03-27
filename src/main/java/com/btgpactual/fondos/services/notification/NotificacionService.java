@@ -1,6 +1,8 @@
 package com.btgpactual.fondos.services.notification;
 
+import com.btgpactual.fondos.models.dto.NotificationRequest;
+
 public interface NotificacionService {
 
-    void send(String to, String message);
+    void send(NotificationRequest request);
 }

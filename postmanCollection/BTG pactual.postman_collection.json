@@ -1,0 +1,308 @@
+{
+  "info": {
+    "_postman_id": "e8d53f88-a9c5-4c44-a4c1-707251d507f8",
+    "name": "BTG pactual",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26246016"
+  },
+  "item": [
+    {
+      "name": "CreateUser",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\r\n    \"email\":\"marlon.anacona12@correounivalle.edu.co\",\r\n    \"name\":\"Marlon\",\r\n    \"password\":\"20092001\",\r\n    \"notificationPreference\":\"EMAIL\",\r\n    \"role\": \"ADMIN\",\r\n    \"celphone\": \"3015812776\"    \r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/v1/User/register",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "v1",
+            "User",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateFunds",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJsb24uYW5kcmVzLmFuYWNvbmExQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NDYxMTg3MiwiZXhwIjoxNzc0Njk4MjcyfQ.9xGYIyHTJQOhdRh_J6iWl1YkPmekWHDc1PKUbBepMj0",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\r\n    \"name\":\"FPV_BTG_PACTUAL_DINAMICA\",\r\n    \"minimumAmount\":\"100000\",\r\n    \"category\":\"FPV\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/v1/Funds/register",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "v1",
+            "Funds",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getAllUsers",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJsb24uYW5kcmVzLmFuYWNvbmExQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NDYxMTg3MiwiZXhwIjoxNzc0Njk4MjcyfQ.9xGYIyHTJQOhdRh_J6iWl1YkPmekWHDc1PKUbBepMj0",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/v1/User/",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "v1",
+            "User",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "getAllFunds",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJsb24uYW5hY29uYTFAY29ycmVvdW5pdmFsbGUuZWR1LmNvIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzc0NjMyOTY2LCJleHAiOjE3NzQ3MTkzNjZ9.7jNs-n6owUqBhHlJe-h-3QWB6WDMf4HnP2IRtKqr2zM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\r\n    \"email\":\"marlon.andres.anacona@gmail.com\",\r\n    \"name\":\"Marlon\",\r\n    \"password\":\"20092001\",\r\n    \"notificationPreference\":\"EMAIL\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/v1/Funds/",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "v1",
+            "Funds",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n\r\n    \"email\":\"marlon.anacona1@correounivalle.edu.co\",\r\n\r\n    \"password\":\"20092001\"\r\n\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/v1/Auth/login",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "v1",
+            "Auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Subscribe",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJsb24uYW5hY29uYUBjb3JyZW91bml2YWxsZS5lZHUuY28iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzc0NjMxNjM0LCJleHAiOjE3NzQ3MTgwMzR9.xImDZnHbIwl8bOIZ538joiIeZBID5HSfHXTLtCLNc-Q",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"fundId\":\"69c66dc5b20041cb8f29d613\",\r\n    \"amount\":\"250000\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/investment/subscribe",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "investment",
+            "subscribe"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Cancellation",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJsb24uYW5hY29uYUBjb3JyZW91bml2YWxsZS5lZHUuY28iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzc0NjMxNjM0LCJleHAiOjE3NzQ3MTgwMzR9.xImDZnHbIwl8bOIZ538joiIeZBID5HSfHXTLtCLNc-Q",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"fundId\":\"69c66dc5b20041cb8f29d613\"\r\n\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/investment/cancel",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "investment",
+            "cancel"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetTransactions",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYXJsb24uYW5hY29uYUBjb3JyZW91bml2YWxsZS5lZHUuY28iLCJyb2xlIjoiQ0xJRU5UIiwiaWF0IjoxNzc0NjE1NjM3LCJleHAiOjE3NzQ3MDIwMzd9.zLxGQCvWwj66WoyXCInCuhknosX2Yf3SkOCIJi98xfw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL_BASE}}/app/investment/transactions",
+          "host": [
+            "{{URL_BASE}}"
+          ],
+          "path": [
+            "app",
+            "investment",
+            "transactions"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

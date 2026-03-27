@@ -35,5 +35,7 @@ public class User {
 
     private NotificationPreference notificationPreference;
 
+    private String celphone;
+
     private List<Investment> investments;
 }
