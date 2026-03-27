@@ -6,7 +6,5 @@ import lombok.Data;
 @Data
 public class CancellationRequest {
 
-    private String customerId;
-
     private String fundId;
 }

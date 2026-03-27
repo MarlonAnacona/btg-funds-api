@@ -9,7 +9,6 @@ import java.util.Optional;
 @Repository
 public interface FundRepository  extends MongoRepository<Fund, String> {
 
-    Optional<Fund> getAll();
     Optional<Fund> findById();
 
 }

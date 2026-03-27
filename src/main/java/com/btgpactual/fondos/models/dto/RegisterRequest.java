@@ -1,7 +1,8 @@
-package com.btgpactual.fondos.models.document;
+package com.btgpactual.fondos.models.dto;
 
-import com.btgpactual.fondos.models.embedded.Investement;
+import com.btgpactual.fondos.models.embedded.Investment;
 import com.btgpactual.fondos.models.enums.NotificationPreference;
+import com.btgpactual.fondos.models.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,16 +17,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "customers")
-public class Customer {
-    @Id
-    private String id;
+public class RegisterRequest {
 
-    private String name;
 
-    private BigDecimal balance;
+        private String email;
 
-    private NotificationPreference notificationPreference;
+        private String password;
 
-    private List<Investement> investments;
+        private String name;
+
+        private NotificationPreference notificationPreference;
+
 }
