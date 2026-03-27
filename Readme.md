@@ -195,6 +195,7 @@ Respuesta:
 
 # Despliegue Spring Boot App en AWS Fargate con MongoDB Atlas
 
+### NOTA: ´Para esta prueba utilicé un solo template por simplicidad. En un entorno real separaría infraestructura base (VPC, ECR) del servicio ECS y usaría CI/CD para el build y push de la imagen.
 ## Pre-requisitos
 - Tener AWS CLI configurado con credenciales (aws configure)
 - Tener Docker instalado y funcionando
