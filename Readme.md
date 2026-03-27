@@ -212,13 +212,13 @@ En la consola bash ejecutar los comandos :
 
 
 ### Etiquetar para ECR
-    docker tag fondos-api:latest <tu-account-id>.dkr.ecr.<tu-region>.amazonaws.com/fondos-api:latest
+    docker tag fondos-api:latest <tu-account-id>.dkr.ecr.<tu-region>.amazonaws.com/btg-fund-api:latest
 
 ### Login en ECR
     aws ecr get-login-password --region <tu-region> | docker login --username AWS --password-stdin <tu-account-id>.dkr.ecr.<tu-region>.amazonaws.com
 
 ### Subir la imagen
-    docker push <tu-account-id>.dkr.ecr.<tu-region>.amazonaws.com/fondos-api:latest
+    docker push <tu-account-id>.dkr.ecr.<tu-region>.amazonaws.com/btg-fund-api:latest
 
 ## Crear stack en AWS cloudformation
 
@@ -226,7 +226,8 @@ En la consola bash ejecutar los comandos :
     aws cloudformation create-stack \
     --stack-name fondos-api-stack \
     --template-body file://cloudformation.yaml \
-    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
+    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+    --parameters ParameterKey=ContainerImage,ParameterValue=<tu-account-id>.dkr.ecr.<tu-region>.amazonaws.com/btg-fund-api:latest
 
 ## Verificación de logs ECS
 
