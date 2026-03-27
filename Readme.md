@@ -207,7 +207,8 @@ Respuesta:
 En la consola bash ejecutar los comandos :
 
 ### Construir la imagen
-    docker build -t fondos-api:latest .
+    docker build -t SPRING_DATA_MONGODB_URI=URL_MONGO_DB   --build-arg SPRING_MAIL_USERNAME=CORREO_PRUEBAS   --build-arg SPRING_MAIL_PASSWORD=PASSWORD_APP_EMAIL   --build-arg SERVER_PORT="8080"   -t fondos-api:latest .
+
 
 ### Etiquetar para ECR
     docker tag fondos-api:latest <tu-account-id>.dkr.ecr.<tu-region>.amazonaws.com/fondos-api:latest
